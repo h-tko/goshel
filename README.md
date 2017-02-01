@@ -11,8 +11,16 @@ $ go get -u github.com/h-tko/goshel
 
 ## How to Use
 
+- 使う
+
 ```
 $ goshel
+```
+
+- 登録されている接続先一覧を見る
+
+```
+$ goshel -l
 ```
 
 ## License
