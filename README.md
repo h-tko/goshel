@@ -6,7 +6,7 @@
 ## Installation
 
 ```
-$ go get -u https://github.com/h-tko/goshel.git
+$ go get -u github.com/h-tko/goshel
 ```
 
 ## How to Use
