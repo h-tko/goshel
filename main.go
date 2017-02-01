@@ -165,7 +165,8 @@ func startssh() error {
     selected, err := showAndSelectList(list)
 
     if err != nil {
-        return err
+        fmt.Printf("%v", err)
+        return nil
     }
 
     if err := execssh(list[selected-1]); err != nil {
