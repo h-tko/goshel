@@ -1,6 +1,7 @@
 package main
 
 import (
+    "flag"
     "bufio"
     "errors"
     "fmt"
@@ -38,6 +39,22 @@ func init() {
 }
 
 func main() {
+
+    f := flag.Bool("l", false, "接続先一覧")
+
+    flag.Parse()
+
+    if *f {
+        list, err := sshList()
+
+        if err != nil {
+            panic(err)
+        }
+
+        showList(list)
+
+        os.Exit(0)
+    }
 
     for {
         var proc string
@@ -176,10 +193,15 @@ func startssh() error {
     return nil
 }
 
-func showAndSelectList(list [][]string) (int, error) {
+func showList(list [][]string) {
     for index, rec := range list {
         fmt.Printf("%d) %s [%s]\n", index+1, rec[ALIAS], rec[HOST])
     }
+}
+
+func showAndSelectList(list [][]string) (int, error) {
+
+    showList(list)
 
     var selectedIndex string
     fmt.Scanln(&selectedIndex)
