@@ -14,3 +14,7 @@ $ go get -u github.com/h-tko/goshel
 ```
 $ goshel
 ```
+
+## License
+
+[MIT](/LICENSE)
