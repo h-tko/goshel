@@ -1,0 +1,21 @@
+{
+    "memo": "0e6be9d6cf343a8db96b0bb8ae84c3f407cf523d2914932b1b0cf97bc4d8d9b4",
+    "projects": [
+        {
+            "name": "github.com/mitchellh/go-homedir",
+            "branch": "master",
+            "revision": "b8bc1bf767474819792c23f32d8286a45736f1c6",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "golang.org/x/crypto",
+            "branch": "master",
+            "revision": "dc137beb6cce2043eb6b5f223ab8bf51c32459f4",
+            "packages": [
+                "ssh"
+            ]
+        }
+    ]
+}
