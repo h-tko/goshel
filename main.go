@@ -6,6 +6,7 @@ import (
     "flag"
     "fmt"
     "github.com/mitchellh/go-homedir"
+    "github.com/mikkeloscar/sshconfig"
     "io/ioutil"
     "log"
     "os"
@@ -48,7 +49,7 @@ func main() {
         list, err := sshList()
 
         if err != nil {
-            fmt.Errorf("%v", err)
+            log.Fatalf("%v", err)
             os.Exit(1)
         }
 
@@ -63,6 +64,7 @@ func main() {
         println("なにします？")
         println("1) ssh実行")
         println("2) 接続先追加")
+        println("3) ssh_config読み込み")
         println("8) 接続先削除")
         println("99) 初期化")
         println("q) Exit")
@@ -79,6 +81,20 @@ func main() {
         case "2":
             if err := configure(); err != nil {
                 log.Fatalf("%v", err)
+            }
+        case "3":
+            hosts, err := loadSSHConfig()
+
+            if err != nil {
+                println("ssh_configファイルを見つけることができませんでした、ごめんね")
+
+                os.Exit(1)
+            }
+
+            if err := addFromSSHConfig(hosts); err != nil {
+                log.Fatalf("%v", err)
+
+                os.Exit(1)
             }
 
         case "8":
@@ -288,4 +304,115 @@ func deleteElement(list [][]string, target int) [][]string {
     }
 
     return result
+}
+
+func loadSSHConfig() ([]*sshconfig.SSHHost, error) {
+    println("ssh_configのフルパスを指定してください（未入力の場合「~/.ssh/config」もしくは「〜/.ssh/ssh_config」を読み込みます")
+
+    var hosts []*sshconfig.SSHHost
+    var sshConfigPath string
+    fmt.Scanln(&sshConfigPath)
+
+    if len(sshConfigPath) > 0 {
+        var err error;
+        hosts, err = sshconfig.ParseSSHConfig(sshConfigPath)
+
+        if err != nil {
+            return nil, err
+        }
+    } else {
+        confDir, err := homedir.Dir()
+
+        if err != nil {
+            log.Fatalf("%v", err)
+        }
+
+        hosts, err = sshconfig.ParseSSHConfig(confDir + "/.ssh/config")
+
+        if err != nil {
+            hosts, err = sshconfig.ParseSSHConfig(confDir + "/.ssh/ssh_config")
+
+            if err != nil {
+                return nil, err
+            }
+        }
+    }
+
+    return hosts, nil
+}
+
+func addFromSSHConfig(hosts []*sshconfig.SSHHost) error {
+    println("登録モードを選んでください")
+    println("1) 追記")
+    println("2) スクラップアンドビルド")
+
+    var div string
+    fmt.Scan(&div)
+
+    switch div {
+        case "1":
+            if err := addSSHHostList(hosts); err != nil {
+                return err
+            }
+
+        case "2":
+            clearConfig()
+
+            if err := addSSHHostList(hosts); err != nil {
+                return err
+            }
+
+        default:
+            return errors.New("範囲外が選択されました")
+    }
+
+    return nil
+}
+
+func addSSHHostList(hosts []*sshconfig.SSHHost) error {
+    for _, host := range hosts {
+
+        var oneHost string
+
+        if len(host.Host) > 1 {
+            index, err := showHostList(host.HostName, host.Host)
+
+            if err != nil {
+                return err
+            }
+
+            oneHost = host.Host[index]
+        } else {
+            oneHost = host.Host[0]
+        }
+
+        fmt.Printf("%sを%sとして追加\n", host.HostName, oneHost)
+
+        if len(host.HostName) > 0 {
+            if err := addConfig(host.HostName, oneHost, strconv.Itoa(host.Port), host.User); err != nil {
+                return err
+            }
+        }
+    }
+
+    return nil
+}
+
+func showHostList(hostname string, host []string) (int, error) {
+    fmt.Printf("%sのホスト名が複数設定されているので、選んでください", hostname)
+
+    for index, d := range host {
+        fmt.Printf("%d) %s\n", index+1, d)
+    }
+
+    var selected string
+    fmt.Scan(&selected)
+
+    selectedIndex, err := strconv.Atoi(selected)
+
+    if err != nil || len(host)+1 < selectedIndex {
+        return -1, errors.New("範囲外が選択されました")
+    }
+
+    return selectedIndex, nil
 }
