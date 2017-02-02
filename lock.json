@@ -1,10 +1,10 @@
 {
-    "memo": "f4a7bef5671adac56001dcdfef4464b3e969d6c82a5591408dc17237f0fc2b4d",
+    "memo": "e70e56f14b6a2d825bcb59079c8c45b12b3898db1aa626cd42c7394e7ed96629",
     "projects": [
         {
-            "name": "github.com/mikkeloscar/sshconfig",
+            "name": "github.com/h-tko/sshconfig-parser",
             "branch": "master",
-            "revision": "fc5e37b16b6829536cf79b6fe356f14da1e77cd6",
+            "revision": "f5f2fe9543a7363966cac6f96cf681c75bdd83db",
             "packages": [
                 "."
             ]

@@ -6,7 +6,7 @@ import (
     "flag"
     "fmt"
     "github.com/mitchellh/go-homedir"
-    "github.com/mikkeloscar/sshconfig"
+    "github.com/h-tko/sshconfig-parser"
     "io/ioutil"
     "log"
     "os"
@@ -307,16 +307,16 @@ func deleteElement(list [][]string, target int) [][]string {
     return result
 }
 
-func loadSSHConfig() ([]*sshconfig.SSHHost, error) {
+func loadSSHConfig() ([]*sshconfig.SSHConfig, error) {
     println("ssh_configのフルパスを指定してください（未入力の場合「~/.ssh/config」もしくは「〜/.ssh/ssh_config」を読み込みます")
 
-    var hosts []*sshconfig.SSHHost
+    var hosts []*sshconfig.SSHConfig
     var sshConfigPath string
     fmt.Scanln(&sshConfigPath)
 
     if len(sshConfigPath) > 0 {
         var err error;
-        hosts, err = sshconfig.ParseSSHConfig(sshConfigPath)
+        hosts, err = sshconfig.Parse(sshConfigPath)
 
         if err != nil {
             return nil, err
@@ -328,10 +328,11 @@ func loadSSHConfig() ([]*sshconfig.SSHHost, error) {
             log.Fatalf("%v", err)
         }
 
-        hosts, err = sshconfig.ParseSSHConfig(confDir + "/.ssh/config")
+        hosts, err = sshconfig.Parse(confDir + "/.ssh/config")
 
         if err != nil {
-            hosts, err = sshconfig.ParseSSHConfig(confDir + "/.ssh/ssh_config")
+
+            hosts, err = sshconfig.Parse(confDir + "/.ssh/ssh_config")
 
             if err != nil {
                 return nil, err
@@ -342,7 +343,7 @@ func loadSSHConfig() ([]*sshconfig.SSHHost, error) {
     return hosts, nil
 }
 
-func addFromSSHConfig(hosts []*sshconfig.SSHHost) error {
+func addFromSSHConfig(hosts []*sshconfig.SSHConfig) error {
     println("登録モードを選んでください")
     println("1) 追記")
     println("2) スクラップアンドビルド")
@@ -370,29 +371,17 @@ func addFromSSHConfig(hosts []*sshconfig.SSHHost) error {
     return nil
 }
 
-func addSSHHostList(hosts []*sshconfig.SSHHost) error {
+func addSSHHostList(hosts []*sshconfig.SSHConfig) error {
     for _, host := range hosts {
 
-        var oneHost string
+        fmt.Printf("%sを%sとして追加\n", host.HostName, host.Host)
 
-        if len(host.Host) > 1 {
-            index, err := showHostList(host.HostName, host.Host)
-
-            if err != nil {
-                return err
-            }
-
-            oneHost = host.Host[index]
-        } else {
-            oneHost = host.Host[0]
+        if len(host.Host) > 0 && len(host.HostName) < 1 {
+            host.HostName = host.Host
         }
 
-        fmt.Printf("%sを%sとして追加\n", host.HostName, oneHost)
-
-        if len(host.HostName) > 0 {
-            if err := addConfig(host.HostName, oneHost, strconv.Itoa(host.Port), host.User); err != nil {
-                return err
-            }
+        if err := addConfig(host.HostName, host.Host, strconv.Itoa(host.Port), host.User); err != nil {
+            return err
         }
     }
 
