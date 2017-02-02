@@ -87,6 +87,7 @@ func main() {
 
             if err != nil {
                 println("ssh_configファイルを見つけることができませんでした、ごめんね")
+                log.Fatalf("%v", err)
 
                 os.Exit(1)
             }
