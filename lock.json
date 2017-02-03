@@ -4,7 +4,7 @@
         {
             "name": "github.com/h-tko/sshconfig-parser",
             "branch": "master",
-            "revision": "f5f2fe9543a7363966cac6f96cf681c75bdd83db",
+            "revision": "501124042b98626bacda723e85e12563e1afe443",
             "packages": [
                 "."
             ]
