@@ -9,6 +9,16 @@
 $ go get -u github.com/h-tko/goshel
 ```
 
+もしくは
+
+```
+$ git clone https://github.com/h-tko/goshel
+
+$ cd goshel
+
+$ cp goshel /usr/local/bin/
+```
+
 ## What I can do
 
 現時点で実装が完了しているのは以下のあたりです。
