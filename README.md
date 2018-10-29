@@ -7,6 +7,9 @@
 
 ```
 $ go get -u github.com/h-tko/goshel
+
+# witchで出なかった
+# cp goshel /usr/local/bin/
 ```
 
 もしくは
